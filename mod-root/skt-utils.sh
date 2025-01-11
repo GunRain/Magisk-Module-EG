@@ -16,7 +16,7 @@ get_target_bin() {
   targetDir="$1"
   fileName="$2"
   targetArch="$3"
-  mv -f "$targetDir/$fileName.$ARCH" "$targetDir/$fileName" || { abort "! Arch \"$targetArch\" is not supported!" || { echo "! Arch \"$targetArch\" is not supported!"; exit 1; }; }
+  mv -f "$targetDir/$fileName.$targetArch" "$targetDir/$fileName" || { abort "! Arch \"$targetArch\" is not supported!" || { echo "! Arch \"$targetArch\" is not supported!"; exit 1; }; }
   del -f $targetDir/$fileName.*
   chmod a+x "$targetDir/$fileName"
 }
