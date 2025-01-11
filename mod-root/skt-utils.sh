@@ -26,9 +26,9 @@ until_key() {
     eventInfo="$(getevent -qlc 1)"
     eventType="$(echo -n "$eventInfo" | awk '{print $2}')"
     [ "$eventType" = EV_KEY ] || continue
-    eventCode="$(echo -n "$eventInfo" | awk '{print $3}')"
     eventValue="$(echo -n "$eventInfo" | awk '{print $4}')"
     [ "$eventValue" = DOWN ] || continue
+    eventCode="$(echo -n "$eventInfo" | awk '{print $3}')"
     case "$eventCode" in
       KEY_VOLUMEUP) echo -n up; return;;
       KEY_VOLUMEDOWN) echo -n down; return;;
