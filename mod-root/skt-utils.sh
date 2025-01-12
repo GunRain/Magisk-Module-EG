@@ -55,6 +55,23 @@ until_key_power() {
   done
 }
 
+get_work_dir() {
+  echo -n "$(dirname "$(readlink -f "$1")")"
+}
+
+until_boot() {
+  resetprop -w sys.boot_completed 0
+}
+
+until_unlock() {
+  until_boot
+  until [ -d /sdcard/Android ]; do sleep 1; done
+}
+
+run_boot_completed_if_magisk() {
+  [ "$KSU$APATCH" != true ] && [ -f "$1/boot-completed.sh" ] && { . "$1/boot-completed.sh"; exit; }
+}
+
 set_system_file() {
   chcon -R u:object_r:system_file:s0 ${@}
 }
