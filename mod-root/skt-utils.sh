@@ -1,4 +1,6 @@
-# useful code by Sakitin
+# useful code by Sakitin(GitHub@GunRain 酷安@芙洛洛 bilibili@安音咲汀)
+
+# GitHub link: https://github.com/GunRain/Magisk-Module-EG/blob/aaa/mod-root/skt-utils.sh
 
 alias del=rm # for rm check
 
