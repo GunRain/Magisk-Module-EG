@@ -7,10 +7,10 @@ alias del=rm # for rm check
 check_files() {
   targetDir="$1"
   hashListFile="$targetDir/hashList.dat"
-  test ! -f "$hashListFile" && { abort '! File "hashList.dat" does not exist!' || { echo '! File "hashList.dat" does not exist!'; exit 1; }; }
+  test ! -f "$hashListFile" && { abort '! File "hashList.dat" does not exist!' 2>/dev/null || { echo '! File "hashList.dat" does not exist!'; exit 1; }; }
   hashList="$(cat "$hashListFile" | zcat)"
   for file in $(find "$targetDir/" -type f -not -path '*META-INF*' -not -name hashList.dat); do
-    [ "$(echo -n "$hashList" | grep " ${file#$targetDir/}" | awk '{print $1}')" = "$(sha1sum "$file" | awk '{print $1}')" ] || { abort '! File validation failed!' || { echo '! File validation failed!'; exit 1; }; }
+    [ "$(echo -n "$hashList" | grep -E " ${file#$targetDir/}$" | awk '{print $1}')" = "$(sha1sum "$file" | awk '{print $1}')" ] || { abort "! Failed to verify file \"${file#$targetDir/}\"!" 2>/dev/null || { echo "! Failed to verify file \"${file#$targetDir/}\"!"; exit 1; }; }
   done
 }
 
@@ -18,7 +18,7 @@ get_target_bin() {
   targetDir="$1"
   fileName="$2"
   targetArch="$3"
-  mv -f "$targetDir/$fileName.$targetArch" "$targetDir/$fileName" || { abort "! Arch \"$targetArch\" is not supported!" || { echo "! Arch \"$targetArch\" is not supported!"; exit 1; }; }
+  mv -f "$targetDir/$fileName.$targetArch" "$targetDir/$fileName" || { abort "! Arch \"$targetArch\" is not supported!" 2>/dev/null || { echo "! Arch \"$targetArch\" is not supported!"; exit 1; }; }
   del -f $targetDir/$fileName.*
   chmod a+x "$targetDir/$fileName"
 }
@@ -95,13 +95,13 @@ set_dir_perm() {
 }
 
 skt_mod_install() {
-  [ "$MODPATH" = '' ] && { abort '! Value "MODPATH" does not exist!' || { echo '! Value "MODPATH" does not exist!'; exit 1; }; }
+  [ "$MODPATH" = '' ] && { abort '! Value "MODPATH" does not exist!' 2>/dev/null || { echo '! Value "MODPATH" does not exist!'; exit 1; }; }
   check_files "$MODPATH"
   del -f "$hashListFile"
 }
 
 skt_mod_install_finish() {
-  [ "$MODPATH" = '' ] && { abort '! Value "MODPATH" does not exist!' || { echo '! Value "MODPATH" does not exist!'; exit 1; }; }
+  [ "$MODPATH" = '' ] && { abort '! Value "MODPATH" does not exist!' 2>/dev/null || { echo '! Value "MODPATH" does not exist!'; exit 1; }; }
   [ -d "$MODPATH/system" ] && {
     set_system_file "$MODPATH/system"
     set_dir_perm "$MODPATH/system"
