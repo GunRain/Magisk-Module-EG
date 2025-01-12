@@ -61,11 +61,13 @@ get_work_dir() {
 
 until_boot() {
   resetprop -w sys.boot_completed 0
+  [ "$1" = '' ] || sleep "$1"
 }
 
 until_unlock() {
   until_boot
   until [ -d /sdcard/Android ]; do sleep 1; done
+  [ "$1" = '' ] || sleep "$1"
 }
 
 run_bin() {
