@@ -80,6 +80,14 @@ run_bin() {
   eval "\"$file\" $@"
 }
 
+nohup_bin() {
+  file="$1"
+  [ -f "$file" ] || return
+  chmod a+x "$file" 2>/dev/null
+  shift
+  eval "nohup \"$file\" $@ >/dev/null 2>&1 &" &
+}
+
 run_boot_completed_if_magisk() {
   [ "$KSU$APATCH" != true ] && [ -f "$1/boot-completed.sh" ] && { . "$1/boot-completed.sh"; exit; }
 }
