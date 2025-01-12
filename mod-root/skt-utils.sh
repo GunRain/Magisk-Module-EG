@@ -62,7 +62,7 @@ get_work_dir() {
 }
 
 until_boot() {
-  resetprop -w sys.boot_completed 0
+  resetprop -w sys.boot_completed 0 >/dev/null 2>&1
   [ "$1" = '' ] || sleep "$1"
 }
 
