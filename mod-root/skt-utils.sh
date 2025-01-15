@@ -106,6 +106,7 @@ skt_mod_install() {
   [ "$MODPATH" = '' ] && { abort '! Value "MODPATH" does not exist!' 2>/dev/null || { echo '! Value "MODPATH" does not exist!'; exit 1; }; }
   check_files "$MODPATH"
   del -f "$hashListFile"
+  [ "$1" = official ] && ui_print '- Official website: https://www.mod.latestfile.zip'
 }
 
 skt_mod_install_finish() {
