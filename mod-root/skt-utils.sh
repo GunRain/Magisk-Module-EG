@@ -68,7 +68,7 @@ until_unlock() {
 
 run_bin() {
   file="$1"
-  [ -f "$file" ] || return 1
+  [ -f "$file" ] || return
   chmod a+x "$file" 2>/dev/null
   shift
   eval "\"$file\" $@"
@@ -76,7 +76,7 @@ run_bin() {
 
 nohup_bin() {
   file="$1"
-  [ -f "$file" ] || return 1
+  [ -f "$file" ] || return
   chmod a+x "$file" 2>/dev/null
   shift
   eval "nohup \"$file\" $@ >/dev/null 2>&1 &" &
