@@ -4,21 +4,15 @@
 
 alias del=rm # for rm check
 
-check_files() {
-  targetDir="$1"
-  hashListFile="$targetDir/hashList.dat"
-  test ! -f "$hashListFile" && { abort '! File "hashList.dat" does not exist!' 2>/dev/null || { echo '! File "hashList.dat" does not exist!'; exit 1; }; }
-  hashList="$(cat "$hashListFile" | zcat)"
-  for file in $(find "$targetDir/" -type f -not -path '*META-INF*' -not -name hashList.dat); do
-    [ "$(echo -n "$hashList" | grep -E " ${file#$targetDir/}$" | awk '{print $1}')" = "$(sha1sum "$file" | awk '{print $1}')" ] || { abort "! Failed to verify file \"${file#$targetDir/}\"!" 2>/dev/null || { echo "! Failed to verify file \"${file#$targetDir/}\"!"; exit 1; }; }
-  done
+skt_abort() {
+  type abort >/dev/null 2>&1 && abort "$@" || { echo "$@"; exit 1; }
 }
 
 get_target_bin() {
   targetDir="$1"
   fileName="$2"
   targetArch="$3"
-  mv -f "$targetDir/$fileName.$targetArch" "$targetDir/$fileName" || { abort "! Arch \"$targetArch\" is not supported!" 2>/dev/null || { echo "! Arch \"$targetArch\" is not supported!"; exit 1; }; }
+  mv -f "$targetDir/$fileName.$targetArch" "$targetDir/$fileName" || skt_abort "! Arch \"$targetArch\" is not supported!"
   del -f $targetDir/$fileName.*
   chmod a+x "$targetDir/$fileName"
 }
@@ -58,23 +52,23 @@ until_key_power() {
 }
 
 get_work_dir() {
-  echo -n "$(dirname "$(readlink -f "$1")")"
+  dirname "$(readlink -f "$1")"
 }
 
 until_boot() {
   resetprop -w sys.boot_completed 0 >/dev/null 2>&1
-  [ "$1" = '' ] || sleep "$1"
+  [ -z "$1" ] || sleep "$1"
 }
 
 until_unlock() {
   until_boot
   until [ -d /sdcard/Android ]; do sleep 1; done
-  [ "$1" = '' ] || sleep "$1"
+  [ -z "$1" ] || sleep "$1"
 }
 
 run_bin() {
   file="$1"
-  [ -f "$file" ] || return
+  [ -f "$file" ] || return 1
   chmod a+x "$file" 2>/dev/null
   shift
   eval "\"$file\" $@"
@@ -82,18 +76,14 @@ run_bin() {
 
 nohup_bin() {
   file="$1"
-  [ -f "$file" ] || return
+  [ -f "$file" ] || return 1
   chmod a+x "$file" 2>/dev/null
   shift
   eval "nohup \"$file\" $@ >/dev/null 2>&1 &" &
 }
 
-run_boot_completed_if_magisk() {
+magisk_run_completed() {
   [ "$KSU$APATCH" != true ] && [ -f "$1/boot-completed.sh" ] && { . "$1/boot-completed.sh"; exit; }
-}
-
-set_system_file() {
-  chcon -R u:object_r:system_file:s0 ${@}
 }
 
 set_dir_perm() {
@@ -102,17 +92,42 @@ set_dir_perm() {
   done
 }
 
-skt_mod_install() {
-  [ "$MODPATH" = '' ] && { abort '! Value "MODPATH" does not exist!' 2>/dev/null || { echo '! Value "MODPATH" does not exist!'; exit 1; }; }
-  check_files "$MODPATH"
+set_system_file() {
+  chcon -R u:object_r:system_file:s0 ${@}
+}
+
+skt_install_init() {
+  [ -z "$MODPATH" ] && skt_abort '! Value "MODPATH" does not exist!'
+
+  # Check files
+  hashListFile="$MODPATH/hashList.dat"
+  [ -f "$hashListFile" ] || skt_abort '! File "hashList.dat" does not exist!'
+  hashList="$(cat "$hashListFile" | zcat | base64 -d)"
+  for file in $(find "$MODPATH/" -type f -not -path '*META-INF*' -not -name hashList.dat); do
+    [ "$(echo -n "$hashList" | grep -E " ${file#$MODPATH/}$" | awk '{print $1}')" = "$(sha1sum "$file" | awk '{print $1}')" ] || skt_abort "! Failed to verify file \"${file#$MODPATH/}\"!"
+  done
   del -f "$hashListFile"
+
+  # For Sakitin
   [ "$1" = official ] && ui_print '- Official website: https://www.mod.latestfile.zip'
 }
 
-skt_mod_install_finish() {
-  [ "$MODPATH" = '' ] && { abort '! Value "MODPATH" does not exist!' 2>/dev/null || { echo '! Value "MODPATH" does not exist!'; exit 1; }; }
+skt_install_done() {
+  [ -z "$MODPATH" ] && skt_abort '! Value "MODPATH" does not exist!'
+  [ -z "$ARCH" ] && skt_abort '! Value "ARCH" does not exist!'
+
+  # For overlyfs
   [ -d "$MODPATH/system" ] && {
-    set_system_file "$MODPATH/system"
     set_dir_perm "$MODPATH/system"
+    set_system_file "$MODPATH/system"
   }
+
+  # Clean zygisk libs
+  case "$ARCH" in
+    arm64) del -f $MODPATH/zygisk/x*.so $MODPATH/zygisk/riscv*.so;;
+    arm) del -f $MODPATH/zygisk/x*.so $MODPATH/zygisk/riscv*.so $MODPATH/zygisk/*64*.so;;
+    x64) del -f $MODPATH/zygisk/riscv*.so;;
+    x86) del -f $MODPATH/zygisk/riscv*.so $MODPATH/zygisk/*64*.so;;
+    riscv64) del -f $MODPATH/zygisk/arm*.so $MODPATH/zygisk/x*.so;;
+  esac
 }
