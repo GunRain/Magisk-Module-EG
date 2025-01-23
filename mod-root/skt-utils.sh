@@ -85,7 +85,7 @@ get_target_bin() {
   local fileName="$2"
   local targetArch="$3"
   mv -f "$targetDir/$fileName.$targetArch" "$targetDir/$fileName" || skt_abort "Arch \"$targetArch\" is not supported!"
-  del -f $targetDir/$fileName.*
+  find "$targetDir" -name "$fileName.*" -delete
   chmod a+x "$targetDir/$fileName"
 }
 
@@ -171,11 +171,18 @@ skt_install_done() {
   # Clean zygisk libs
   [ -d "$MODPATH/zygisk" ] && {
     case "$ARCH" in
-      arm64) del -f $MODPATH/zygisk/x*.so $MODPATH/zygisk/riscv*.so;;
-      arm) del -f $MODPATH/zygisk/x*.so $MODPATH/zygisk/riscv*.so $MODPATH/zygisk/*64*.so;;
-      x64) del -f $MODPATH/zygisk/riscv*.so;;
-      x86) del -f $MODPATH/zygisk/riscv*.so $MODPATH/zygisk/*64*.so;;
-      riscv64) del -f $MODPATH/zygisk/arm*.so $MODPATH/zygisk/x*.so;;
+      arm64) find "$MODPATH/zygisk" -name "riscv*.so" -o -name "x*.so" -delete;;
+      arm) find "$MODPATH/zygisk" -name "riscv*.so" -o -name "x*.so" -o -name "*64*.so" -delete;;
+      x64) find "$MODPATH/zygisk" -name "riscv*.so" -delete;;
+      x86) find "$MODPATH/zygisk" -name "riscv*.so" -o -name "*64*.so" -delete;;
+      riscv64) find "$MODPATH/zygisk" -name "arm*.so" -o -name "x*.so" -delete;;
     esac
   }
+
+  # Clean useless files (just simply)
+  for file in README LICENSE SECURITY; do
+    for suffix in '' '.txt' '.md' '.mkd'; do 
+      [ -f "$MODPATH/$file$suffix" ] && del -rf "$MODPATH/$file$suffix"
+    done
+  done
 }
