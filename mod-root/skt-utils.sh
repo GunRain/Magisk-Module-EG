@@ -19,40 +19,54 @@ get_target_bin() {
 
 until_key() {
   while :; do
-    eventInfo="$(getevent -qlc 1)"
-    eventType="$(echo -n "$eventInfo" | awk '{print $2}')"
-    [ "$eventType" = EV_KEY ] || continue
-    eventValue="$(echo -n "$eventInfo" | awk '{print $4}')"
-    [ "$eventValue" = DOWN ] || continue
-    eventCode="$(echo -n "$eventInfo" | awk '{print $3}')"
-    case "$eventCode" in
-      KEY_VOLUMEUP) echo -n up; return;;
-      KEY_VOLUMEDOWN) echo -n down; return;;
-      KEY_POWER) echo -n power; return;;
+    eventCode=`getevent -qlc 1 | awk '{if ($2=="EV_KEY" && $4=="DOWN") {print $3; exit}}'`
+    case $eventCode in
+      KEY_VOLUMEUP) printf up; return;;
+      KEY_VOLUMEDOWN) printf down; return;;
+      KEY_POWER) printf power; return;;
+      KEY_F[1-9]|KEY_F1[0-9]|KEY_F2[0-4]) printf ${eventCode/KEY_F/f}; return;;
+    esac
+  done
+}
+
+until_key_up_down() {
+  while :; do
+    key=`until_key`
+    case $key in
+      up|down) printf $key; return;;
+    esac
+  done
+}
+
+until_key_up_down_power() {
+  while :; do
+    key=`until_key`
+    case $key in
+      up|down|power) printf $key; return;;
     esac
   done
 }
 
 until_key_up() {
-  until [ `until_key` = up ]; do
-    sleep 0.1
+  while :; do
+    [ `until_key` = up ] && return
   done
 }
 
 until_key_down() {
-  until [ `until_key` = down ]; do
-    sleep 0.1
+  while :; do
+    [ `until_key` = down ] && return
   done
 }
 
 until_key_power() {
-  until [ `until_key` = power ]; do
-    sleep 0.1
+  while :; do
+    [ `until_key` = power ] && return
   done
 }
 
 get_work_dir() {
-  dirname "$(readlink -f "$1")"
+  dirname "`readlink -f "$1"`"
 }
 
 until_boot() {
@@ -82,8 +96,20 @@ nohup_bin() {
   eval "nohup \"$file\" $@ >/dev/null 2>&1 &" &
 }
 
+is_ksu() {
+  [ "$KSU" = true ]
+}
+
+is_ap() {
+  [ "$APATCH" = true ]
+}
+
+not_magisk() {
+  is_ksu || is_ap
+}
+
 magisk_run_completed() {
-  [ "$KSU$APATCH" != true ] && [ -f "$1/boot-completed.sh" ] && { . "$1/boot-completed.sh"; exit; }
+  not_magisk || { [ -f "$1/boot-completed.sh" ] && exec "$1/boot-completed.sh"; }
 }
 
 set_dir_perm() {
@@ -102,7 +128,7 @@ skt_install_init() {
   # Check files
   hashListFile="$MODPATH/hashList.dat"
   [ -f "$hashListFile" ] || skt_abort '! File "hashList.dat" does not exist!'
-  hashList="$(cat "$hashListFile" | zcat | base64 -d)"
+  hashList="`cat "$hashListFile" | zcat | base64 -d`"
   for file in $(find "$MODPATH/" -type f -not -path '*META-INF*' -not -name hashList.dat); do
     [ "$(echo -n "$hashList" | grep -E " ${file#$MODPATH/}$" | awk '{print $1}')" = "$(sha1sum "$file" | awk '{print $1}')" ] || skt_abort "! Failed to verify file \"${file#$MODPATH/}\"!"
   done
@@ -123,11 +149,13 @@ skt_install_done() {
   }
 
   # Clean zygisk libs
-  case "$ARCH" in
-    arm64) del -f $MODPATH/zygisk/x*.so $MODPATH/zygisk/riscv*.so;;
-    arm) del -f $MODPATH/zygisk/x*.so $MODPATH/zygisk/riscv*.so $MODPATH/zygisk/*64*.so;;
-    x64) del -f $MODPATH/zygisk/riscv*.so;;
-    x86) del -f $MODPATH/zygisk/riscv*.so $MODPATH/zygisk/*64*.so;;
-    riscv64) del -f $MODPATH/zygisk/arm*.so $MODPATH/zygisk/x*.so;;
-  esac
+  [ -d "$MODPATH/zygisk" ] && {
+    case "$ARCH" in
+      arm64) del -f $MODPATH/zygisk/x*.so $MODPATH/zygisk/riscv*.so;;
+      arm) del -f $MODPATH/zygisk/x*.so $MODPATH/zygisk/riscv*.so $MODPATH/zygisk/*64*.so;;
+      x64) del -f $MODPATH/zygisk/riscv*.so;;
+      x86) del -f $MODPATH/zygisk/riscv*.so $MODPATH/zygisk/*64*.so;;
+      riscv64) del -f $MODPATH/zygisk/arm*.so $MODPATH/zygisk/x*.so;;
+    esac
+  }
 }
