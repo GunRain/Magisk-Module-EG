@@ -4,4 +4,4 @@ version=Version 1
 versionCode=1
 author=Sakitin (GitHub@GunRain)
 description=Module eg.
-updateJson=
+updateJson=https://github.com/GunRain/Magisk-Module-EG/raw/aaa/update.json
