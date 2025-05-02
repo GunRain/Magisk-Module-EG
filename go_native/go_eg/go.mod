@@ -1,3 +1,3 @@
-module niggergo.work/go_eg
+module app.niggergo.work/go_eg
 
-go 1.23.4
+go 1.18
