@@ -23,8 +23,13 @@ jobs:
           input-dir: ${{ github.workspace }}/..
           input-id: ${{ env.MOD_ID }}
           output-dir: ${{ github.workspace }}/output
+      - name: Unzip Instpkg
+        run: |
+          unzip "${{ github.workspace }}/output/${{ env.MOD_ID }}/instpkg.zip" -d "${{ github.workspace }}/output/${{ env.MOD_ID }}"
+          rm "${{ github.workspace }}/output/${{ env.MOD_ID }}/instpkg.zip"
       - name: Upload Instpkg
         uses: actions/upload-artifact@v4
         with:
           name: ci
-          path: ${{ github.workspace }}/output/${{ env.MOD_ID }}/instpkg.zip
+          path: ${{ github.workspace }}/output/${{ env.MOD_ID }}
+          compression-level: 9
