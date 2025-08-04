@@ -55,7 +55,7 @@ jobs:
           input-id: ${{ env.MOD_ID }}
           output-dir: ${{ github.workspace }}/output
           zip-name: ${{ github.event.inputs.zip_name }}
-      - name: Create GitHub Release
+      - name: Upload Release
         if: ${{ github.event.inputs.release }}
         uses: softprops/action-gh-release@v2
         with:
@@ -68,7 +68,7 @@ jobs:
         run: |
           unzip "${{ github.workspace }}/output/${{ env.MOD_ID }}/${{ github.event.inputs.zip_name }}.zip" -d "${{ github.workspace }}/output/${{ env.MOD_ID }}"
           rm "${{ github.workspace }}/output/${{ env.MOD_ID }}/${{ github.event.inputs.zip_name }}.zip"
-      - name: Upload Instpkg
+      - name: Upload Artifact
         if: ${{ github.event.inputs.artifact }}
         uses: actions/upload-artifact@v4
         with:
