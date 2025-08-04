@@ -1,0 +1,77 @@
+name: Release Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact:
+        description: 'Use actions/upload-artifact'
+        required: false
+        default: false
+        type: boolean
+      release:
+        description: 'Use softprops/action-gh-release'
+        required: false
+        default: false
+        type: boolean
+      tag_name:
+        description: 'Tag Name for softprops/action-gh-release'
+        required: false
+        default: ''
+        type: string
+      body_path:
+        description: 'Body Path for softprops/action-gh-release'
+        required: false
+        default: ''
+        type: string
+      rel_name:
+        description: 'Release Name for softprops/action-gh-release'
+        required: false
+        default: ''
+        type: string
+      zip_name:
+        description: 'Name for Module Zip'
+        required: false
+        default: instpkg
+        type: string
+
+jobs:
+  rel_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: true
+      - name: Set Env
+        run: |
+          echo MOD_ID="$(basename "$(pwd)")" >> $GITHUB_ENV
+          test -f LICENSE.txt && test ! -f src/LICENSE.txt && cp LICENSE.txt src/LICENSE.txt
+      - name: Build Module
+        id: mod
+        uses: OOM-WG/ROOT-Modules-Auto-Builder@v1
+        with:
+          input-dir: ${{ github.workspace }}/..
+          input-id: ${{ env.MOD_ID }}
+          output-dir: ${{ github.workspace }}/output
+          zip-name: ${{ github.event.inputs.zip_name }}
+      - name: Create GitHub Release
+        if: ${{ github.event.inputs.release }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag_name }}
+          body_path: ${{ github.event.inputs.body_path }}
+          name: ${{ github.event.inputs.rel_name }}
+          files: ${{ github.workspace }}/output/${{ env.MOD_ID }}/${{ github.event.inputs.zip_name }}.zip
+      - name: Unzip Instpkg
+        if: ${{ github.event.inputs.artifact }}
+        run: |
+          unzip "${{ github.workspace }}/output/${{ env.MOD_ID }}/${{ github.event.inputs.zip_name }}.zip" -d "${{ github.workspace }}/output/${{ env.MOD_ID }}"
+          rm "${{ github.workspace }}/output/${{ env.MOD_ID }}/${{ github.event.inputs.zip_name }}.zip"
+      - name: Upload Instpkg
+        if: ${{ github.event.inputs.artifact }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.inputs.zip_name }}
+          path: ${{ github.workspace }}/output/${{ env.MOD_ID }}
+          compression-level: 9
