@@ -5,12 +5,12 @@ on:
     inputs:
       artifact:
         description: 'Use actions/upload-artifact'
-        required: false
+        required: true
         default: false
         type: boolean
       release:
         description: 'Use softprops/action-gh-release'
-        required: false
+        required: true
         default: false
         type: boolean
       tag_name:
@@ -30,7 +30,7 @@ on:
         type: string
       zip_name:
         description: 'Name for Module Zip'
-        required: false
+        required: true
         default: instpkg
         type: string
 
