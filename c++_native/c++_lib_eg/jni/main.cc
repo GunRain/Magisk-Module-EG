@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "zygisk.hpp"
+#include "zygisk.hh"
 
 using zygisk::Api;
 using zygisk::AppSpecializeArgs;

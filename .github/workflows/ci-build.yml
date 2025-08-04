@@ -1,0 +1,29 @@
+name: CI Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ci_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: true
+      - name: Set Env
+        run: |
+          echo id="$(dirname "$(pwd)")" >> $GITHUB_ENV
+          test -f LICENSE.txt && test ! -f src/LICENSE.txt && cp LICENSE.txt src/LICENSE.txt
+      - name: Build Module
+        uses: OOM-WG/ROOT-Modules-Auto-Builder@v1
+        with:
+          input-dir: ${{ github.workspace }}/..
+          input-id: ${{ env.id }}
+          output-dir: ${{ github.workspace }}/output
+      - name: Upload Instpkg
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci
+          path: output/${{ env.id }}/instpkg.pkg
