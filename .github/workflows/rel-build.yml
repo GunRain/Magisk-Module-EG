@@ -33,7 +33,8 @@ on:
         required: true
         default: instpkg
         type: string
-
+permissions:
+  contents: write
 jobs:
   rel_build:
     runs-on: ubuntu-latest
