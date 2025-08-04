@@ -14,16 +14,17 @@ jobs:
           submodules: true
       - name: Set Env
         run: |
-          echo id="$(dirname "$(pwd)")" >> $GITHUB_ENV
+          echo MOD_ID="$(basename "$(pwd)")" >> $GITHUB_ENV
           test -f LICENSE.txt && test ! -f src/LICENSE.txt && cp LICENSE.txt src/LICENSE.txt
       - name: Build Module
+        id: mod
         uses: OOM-WG/ROOT-Modules-Auto-Builder@v1
         with:
           input-dir: ${{ github.workspace }}/..
-          input-id: ${{ env.id }}
+          input-id: ${{ env.MOD_ID }}
           output-dir: ${{ github.workspace }}/output
       - name: Upload Instpkg
         uses: actions/upload-artifact@v4
         with:
           name: ci
-          path: output/${{ env.id }}/instpkg.pkg
+          path: ${{ steps.mod.outputs.zips }}/${{ env.MOD_ID }}/instpkg.zip
