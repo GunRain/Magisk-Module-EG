@@ -50,7 +50,7 @@ jobs:
           test -f LICENSE.txt && test ! -f src/LICENSE.txt && cp LICENSE.txt src/LICENSE.txt
       - name: Build Module
         id: mod
-        uses: OOM-WG/ROOT-Modules-Auto-Builder@v1
+        uses: OOM-WG/ShiroSU-Modules-Builder@v1
         with:
           input-dir: ${{ github.workspace }}/..
           input-id: ${{ env.MOD_ID }}
