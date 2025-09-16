@@ -1,12 +1,12 @@
-id=mod-eg
-name=Module EG
+id=ssu-mod-eg
+name=SSU Module E.G.
 # nameAnsi=...
 version=Version 1
 # versionAnsi=...
 versionCode=1
-author=Anne Sakitin (GitHub@TianwanTW)
+author=SSU Developers (O.O.M. W.G.)
 # authorAnsi=...
-description=Module eg.
+description=ShiroSU module e.g.
 # descriptionAnsi=...
 action=Action
 # actionAnsi=...
