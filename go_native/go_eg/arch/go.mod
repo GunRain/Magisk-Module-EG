@@ -1,3 +1,3 @@
-module sakit.in/mod-bld/arch
+module oom-wg.dev/ssu/modules-builder/arch
 
 go 1.18
