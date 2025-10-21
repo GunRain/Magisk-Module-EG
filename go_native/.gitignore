@@ -1,0 +1,11 @@
+*.test
+
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+
+go.sum
+
+go.work
+go.work.sum
