@@ -1,6 +1,8 @@
-LOCAL_PATH:= $(call my-dir)
+LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
+
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/inc
 
 LOCAL_SRC_FILES := $(LOCAL_PATH)/main.cc
 
