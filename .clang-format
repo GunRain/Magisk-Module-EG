@@ -10,21 +10,21 @@ LineEnding: LF
 UseCRLF: false
 UseTab: Always
 InsertNewlineAtEOF: false
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: DontAlign
 AlignArrayOfStructures: Right
 AlignConsecutiveAssignments:
   Enabled: true
   AcrossEmptyLines: false
   AcrossComments: false
-  AlignFunctionDeclarations: false
-  AlignFunctionPointers: false
+  AlignCompound: true
+  PadOperators: true
 AlignConsecutiveBitFields: Consecutive
 AlignConsecutiveDeclarations:
   Enabled: true
   AcrossEmptyLines: false
   AcrossComments: false
-  AlignCompound: true
-  PadOperators: true
+  AlignFunctionDeclarations: false
+  AlignFunctionPointers: false
 AlignConsecutiveMacros: Consecutive
 AlignConsecutiveShortCaseStatements:
   Enabled: true
@@ -46,8 +46,9 @@ AllowShortFunctionsOnASingleLine: All
 AllowShortIfStatementsOnASingleLine: AllIfsAndElse
 AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
-BinPackArguments: false
-BinPackParameters: OnePerLine
+AllowShortNamespacesOnASingleLine: true
+BinPackArguments: true
+BinPackParameters: BinPack
 BitFieldColonSpacing: After
 BreakAdjacentStringLiterals: false
 BreakAfterAttributes: Always
@@ -110,19 +111,19 @@ KeepEmptyLines:
   AtStartOfFile:  false
 LambdaBodyIndentation: OuterScope
 MaxEmptyLinesToKeep: 1
-NamespaceIndentation: All
+NamespaceIndentation: Inner
 PackConstructorInitializers: NextLine
 PointerAlignment: Left
 PPIndentWidth: -1
 QualifierAlignment: Custom
 QualifierOrder:
+  - inline
   - type
   - static
   - friend
   - constexpr
   - const
   - volatile
-  - inline
   - restrict
 ReferenceAlignment: Left
 ReflowComments: IndentOnly
