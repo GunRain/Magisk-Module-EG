@@ -117,11 +117,11 @@ PointerAlignment: Left
 PPIndentWidth: -1
 QualifierAlignment: Custom
 QualifierOrder:
-  - inline
-  - type
-  - static
   - friend
   - constexpr
+  - static
+  - inline
+  - type
   - const
   - volatile
   - restrict
