@@ -1,4 +1,4 @@
-# [模块示例模板](https://ssu.oom-wg.dev/dev/module/builder)
+# [模块示例模板](https://oom-wg.dev/ssu/dev/root/mod/builder)
 
 [构建工具](https://github.com/OOM-WG/ShiroSU-Modules-Builder)
 
