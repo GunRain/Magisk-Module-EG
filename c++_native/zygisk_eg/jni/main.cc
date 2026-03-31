@@ -7,13 +7,13 @@ using zygisk::AppSpecializeArgs;
 using zygisk::ServerSpecializeArgs;
 
 class Lib_EG : public zygisk::ModuleBase {
-public:
+   public:
 	void onLoad(Api* api, JNIEnv* env) override {
 		this->api = api;
 		this->env = env;
 	}
 
-private:
+   private:
 	Api*	api;
 	JNIEnv* env;
 };
