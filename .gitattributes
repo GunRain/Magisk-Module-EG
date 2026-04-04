@@ -1,5 +1,17 @@
 * text=auto
 
+*.config.js linguist-vendored
+*.config.[cm]js linguist-vendored
+*.config.ts linguist-vendored
+*.config.[cm]ts linguist-vendored
+
+*.gradle linguist-vendored
+*.gradle.kts linguist-vendored
+gradlew linguist-vendored
+gradlew.bat linguist-vendored
+amper linguist-vendored
+amper.bat linguist-vendored
+
 update-binary text eol=lf
 updater-script text eol=lf
 
