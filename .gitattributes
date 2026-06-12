@@ -11,6 +11,8 @@ gradlew linguist-vendored
 gradlew.bat linguist-vendored
 amper linguist-vendored
 amper.bat linguist-vendored
+kotlin linguist-vendored
+kotlin.bat linguist-vendored
 
 update-binary text eol=lf
 updater-script text eol=lf
